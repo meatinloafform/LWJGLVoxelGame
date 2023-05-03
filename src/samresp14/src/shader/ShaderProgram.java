@@ -13,7 +13,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
-public abstract class Shader {
+public abstract class ShaderProgram {
 	// ROOM 315
 	private int programID;
 	private Map<String, Integer> uniformLocations;
@@ -21,7 +21,7 @@ public abstract class Shader {
 	// 4x4
 	private FloatBuffer matrix = BufferUtils.createFloatBuffer(16);
 	
-	public Shader(String vert_source, String frag_source) {
+	public ShaderProgram(String vert_source, String frag_source) {
 		int vertexID = loadShader(vert_source, GL20.GL_VERTEX_SHADER);
 		int fragmentID = loadShader(frag_source, GL20.GL_FRAGMENT_SHADER);
 		programID = GL20.glCreateProgram();

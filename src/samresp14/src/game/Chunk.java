@@ -69,30 +69,46 @@ public class Chunk {
 								addDirQuad(i, x, y, z, blockID, builder);
 							}
 						} else {
-							if (pX < 0 && neighborWest != null) {
-								// West
-								if (neighborWest.blocks[pZ][pY][15].id == 0) {
+							// West
+							if (pX < 0) {
+								if (neighborWest != null) {
+									if (neighborWest.blocks[pZ][pY][15].id == 0) {
+										addDirQuad(i, x, y, z, blockID, builder);
+									}
+								} else {
 									addDirQuad(i, x, y, z, blockID, builder);
 								}
 							}
 							
-							if (pX >= blocks[0][0].length && neighborEast != null) {
-								// East
-								if (neighborEast.blocks[pZ][pY][0].id == 0) {
+							// East
+							if (pX >= blocks[0][0].length) {
+								if (neighborEast != null) {
+									if (neighborEast.blocks[pZ][pY][0].id == 0) {
+										addDirQuad(i, x, y, z, blockID, builder);
+									}
+								} else {
 									addDirQuad(i, x, y, z, blockID, builder);
 								}
 							}
 							
-							if (pZ < 0 && neighborSouth != null) {
-								// South
-								if (neighborSouth.blocks[15][pY][pX].id == 0) {
+							// South
+							if (pZ < 0) {
+								if (neighborSouth != null) {
+									if (neighborSouth.blocks[15][pY][pX].id == 0) {
+										addDirQuad(i, x, y, z, blockID, builder);
+									}
+								} else {
 									addDirQuad(i, x, y, z, blockID, builder);
 								}
 							}
 							
-							if (pZ >= blocks.length && neighborNorth != null) {
-								// North
-								if (neighborNorth.blocks[0][pY][pX].id == 0) {
+							// North
+							if (pZ >= blocks.length) {
+								if (neighborNorth != null) {
+									if (neighborNorth.blocks[0][pY][pX].id == 0) {
+										addDirQuad(i, x, y, z, blockID, builder);
+									}
+								} else {
 									addDirQuad(i, x, y, z, blockID, builder);
 								}
 							}

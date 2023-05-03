@@ -68,6 +68,6 @@ public class Camera {
 	
 	public Matrix4f view() {
 		Vector3f camTarget = new Vector3f(position.x + direction.x, position.y + direction.y, position.z + direction.z);
-		return new Matrix4f().lookAt(position, camTarget, up).translate(-position.x, -position.y, -position.z);
+		return new Matrix4f().lookAt(position, camTarget, up);//.translate(-position.x, -position.y, -position.z);
 	}
 }

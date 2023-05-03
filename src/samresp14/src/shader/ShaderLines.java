@@ -1,16 +1,16 @@
 package samresp14.src.shader;
 
-public class ShaderTextured extends ShaderProgram {
+public class ShaderLines extends ShaderProgram {
 
-	public ShaderTextured() {
-		super("textured.vs", "textured.fs");
+	public ShaderLines() {
+		super("lines.vs", "lines.fs");
 	}
 
 	@Override
 	protected void bindAttributes() {
 		// TODO Auto-generated method stub
 		super.bindAttribute(0, "position");
-		super.bindAttribute(1, "in_uvs");
+		//super.bindAttribute(1, "in_uvs");
 	}
 
 	@Override
@@ -19,6 +19,7 @@ public class ShaderTextured extends ShaderProgram {
 		super.findUniformLocation("model");
 		super.findUniformLocation("view");
 		super.findUniformLocation("projection");
+		super.findUniformLocation("color");
 	}
 	
 }

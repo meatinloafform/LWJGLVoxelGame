@@ -40,12 +40,17 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 
+import samresp14.src.game.Chunk;
 import samresp14.src.game.World;
 import samresp14.src.game.blocks.Blocks;
 import samresp14.src.game.collider.AABBCollider;
+import samresp14.src.game.collider.WorldCollider;
 import samresp14.src.game.worldgen.feature.BlobFeature;
 import samresp14.src.game.worldgen.feature.SphereFeature;
+import samresp14.src.rendering.MeshRenderer;
+import samresp14.src.rendering.RendererBundle;
 import samresp14.src.shader.ShaderTextured;
+import samresp14.src.util.VectorUtil;
 
 // TODO: 3D grid raycast, 3D player controller, multi-chunk rendering
 // inventory
@@ -149,12 +154,17 @@ public class Main {
 		//chunk.generateMesh(texture);
 		
 		World world = new World(texture);
-		world.addChunk(new Vector2i(0, 1));
-		world.addChunk(new Vector2i(0, 0));
-		world.addChunk(new Vector2i(0, -1));
+//		world.addChunk(new Vector2i(0, 1));
+//		world.addChunk(new Vector2i(0, 0));
+//		world.addChunk(new Vector2i(0, -1));
 		
 		world.setBlock(new Vector3i(8, 8, 8), Blocks.BLOCK_BRICK);		
 		world.setBlock(new Vector3i(8, 9, 8), Blocks.BLOCK_GHOST);
+		
+		world.setBlock(new Vector3i(0, 0, 0), Blocks.BLOCK_WHITE);
+		
+		SphereFeature theEternalSphere = new SphereFeature(new Vector3i(0, 24, 0), Blocks.BLOCK_BRICK, 25);
+		theEternalSphere.apply(world);
 		
 		SphereFeature sphere = new SphereFeature(new Vector3i(8, 8, 0), Blocks.BLOCK_GHOST, 3);
 		sphere.apply(world);
@@ -177,14 +187,17 @@ public class Main {
 		
 		Camera camera = new Camera();
 		camera.position = new Vector3f(0f, 0f, 5f);
-		Renderer renderer = new Renderer(shader, camera);
+		RendererBundle renderer = new RendererBundle(camera);
+		AABBCollider collider = new AABBCollider(new Vector3f(), new Vector3f(1f, 2f, 1f));
+		WorldCollider worldCollider = new WorldCollider(world);
+		//MeshRenderer renderer = new MeshRenderer(shader, camera);
 		Input.lockMouse();
 		
 		while (!glfwWindowShouldClose(window)) {
 			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 			
 			if (aspectChanged) {
-				renderer.setAspect(aspect);
+				renderer.updateAspect(aspect);
 				aspectChanged = false;
 			}
 			
@@ -197,10 +210,25 @@ public class Main {
 				camera.rotationFrozen = false;
 			}
 			
-			camera.update();
+			if (Input.keyJustPressed(GLFW.GLFW_KEY_SPACE)) {
+				world.setBlock(World.worldToBlockSpace(camera.position), Blocks.BLOCK_GHOST);
+			}
 			
+			camera.update();
+			collider.position = new Vector3f(camera.position).sub(new Vector3f(0.5f, 1f, 0.5f));
+			collider.resolve(worldCollider);
 			world.update();
-			world.render(renderer);
+			world.render(renderer.mesh);
+			
+			// draw chunk borders
+			Vector3i blockPos = World.worldToBlockSpace(camera.position);
+			Vector2i chunkPos = world.getChunkPos(new Vector2i(blockPos.x, blockPos.z));
+			Vector3f worldPos = new Vector3f((float)chunkPos.x * 16f - 0.5f, -0.5f, (float)chunkPos.y * 16f - 0.5f);
+			Vector3f endPos = new Vector3f(worldPos.x + 16f, 63.5f, worldPos.z + 16f);
+			renderer.debug.drawCube(worldPos, endPos, Color.GREEN);
+//			Vector3f zero = World.blockToWorldSpace(World.worldToBlockSpace(camera.position));
+//			Vector3f one = new Vector3f(zero.x + 1f, zero.y + 1f, zero.z + 1f);
+//			renderer.debug.drawCube(zero, one, Color.RED);
 			//renderer.draw(chunk.mesh);
 			
 			GLFW.glfwSwapBuffers(window);

@@ -12,13 +12,13 @@ public class WorldCollider extends Collider {
 	@Override
 	public CollisionResult resolve(Collider other) {
 		if (other instanceof AABBCollider) {
-			
+			return null;
 		} else {
 			return null;
 		}
 	}
 	
-	private boolean intersect(AABBCollider other) {
-		
-	}
+//	private boolean intersect(AABBCollider other) {
+//		
+//	}
 }

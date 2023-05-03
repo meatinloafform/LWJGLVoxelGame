@@ -28,7 +28,7 @@ public class ProtoChunk {
 	}
 	
 	public Chunk build(World world, WorldBuilder builder) {
-		world.addChunk(position);
+		//world.addChunk(position);
 		Chunk chunk = world.addChunk(position);
 		for (QueuedPlacement placement : placements) {
 			chunk.setBlock(placement.block.getDefaultBlockState(), placement.pos.x, placement.pos.y, placement.pos.z);

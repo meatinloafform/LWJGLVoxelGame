@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.joml.Vector2i;
+import org.joml.Vector3f;
 import org.joml.Vector3i;
 
-import samresp14.src.Renderer;
 import samresp14.src.Texture;
 import samresp14.src.game.blocks.Block;
 import samresp14.src.game.blocks.BlockState;
 import samresp14.src.game.worldgen.ProtoChunk;
 import samresp14.src.game.worldgen.WorldBuilder;
+import samresp14.src.rendering.MeshRenderer;
 
 public class World {
 	private List<Chunk> chunks;
@@ -41,6 +42,22 @@ public class World {
 		}
 		
 		return null;
+	}
+	
+	public static Vector3i worldToBlockSpace(Vector3f world) {
+		return new Vector3i(
+			(int)(world.x + (world.x > 0 ? 0.5 : -0.5)),
+			(int)(world.y + (world.y > 0 ? 0.5 : -0.5)),
+			(int)(world.z + (world.z > 0 ? 0.5 : -0.5))
+		);
+	}
+	
+	public static Vector3f blockToWorldSpace(Vector3i block) {
+		return new Vector3f(
+			((float)block.x) - 0.5f,
+			((float)block.y) - 0.5f,
+			((float)block.z) - 0.5f
+		);
 	}
 	
 	public void markNeighborsDirty(Chunk chunk) {
@@ -99,12 +116,13 @@ public class World {
 		return chunk;
 	}
 	
-	private Vector2i getChunkPos(Vector2i position) {
-		return new Vector2i(position.x >= 0 ? position.x / 16 : (position.x / 16) - 1, position.y >= 0 ? position.y / 16 : (position.y / 16) - 1);
+	public Vector2i getChunkPos(Vector2i position) {
+		return new Vector2i(position.x >= 0 ? (position.x + 1) / 16 : (position.x / 16) - 1, position.y >= 0 ? position.y / 16 : ((position.y + 1) / 16) - 1);
 	}
 	
 	private int chunkMod(int pos) {
-		return pos >= 0 ? pos % 16 : 16 - (Math.abs(pos) % 16);
+		//System.out.println(16 - (Math.abs(pos) % 16));
+		return pos >= 0 ? pos % 16 : 15 - (Math.abs(pos + 1) % 16);
 	}
 	
 	private Vector3i chunkPlacementPos(Vector3i position) {
@@ -136,10 +154,12 @@ public class World {
 	}
 	
 	public BlockState getBlock(Vector3i position) {
-		Vector2i chunkPos = new Vector2i(position.x, position.z).div(16);
+		if (position.y < 0 || position.y >= 64) { return BlockState.AIR; }
+		
+		Vector2i chunkPos = getChunkPos(new Vector2i(position.x, position.z));
 		Chunk chunk = getChunk(chunkPos);
 		if (chunk != null) {
-			return chunk.getBlock(position.x % 16, position.y, position.z % 16);
+			return chunk.getBlock(chunkMod(position.x), position.y, chunkMod(position.z));
 		}
 		
 		return BlockState.AIR;
@@ -168,13 +188,16 @@ public class World {
 		
 		for (Chunk chunk : chunks) {
 			if (chunk.changed) {
+				if (!dirtyChunks.contains(chunk.getID())) {
+					dirtyChunks.add(chunk.getID());
+				}
 				markNeighborsDirty(chunk);
 				chunk.changed = false;
 			}
 		}
 	}
 	
-	public void render(Renderer renderer) {
+	public void render(MeshRenderer renderer) {
 		for (Chunk chunk : chunks) {
 			if (chunk.mesh != null) {
 				renderer.draw(chunk.mesh);
