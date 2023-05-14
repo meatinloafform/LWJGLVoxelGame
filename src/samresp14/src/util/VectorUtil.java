@@ -11,4 +11,8 @@ public final class VectorUtil {
 	public static Vector3i fromVector3f(Vector3f vf) {
 		return new Vector3i((int)vf.x, (int)vf.y, (int)vf.z);
 	}
+	
+	public static String vecToString(Vector3f v) {
+		return "(" + v.x + ", " + v.y + ", " + v.z + ")";
+	}
 }

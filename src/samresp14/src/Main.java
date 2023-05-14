@@ -153,7 +153,9 @@ public class Main {
 		
 		//chunk.generateMesh(texture);
 		
-		World world = new World(texture);
+		Camera camera = new Camera();
+		World world = new World(texture, camera);
+		world.player.move(new Vector3f(0f, -10f, 0f));
 //		world.addChunk(new Vector2i(0, 1));
 //		world.addChunk(new Vector2i(0, 0));
 //		world.addChunk(new Vector2i(0, -1));
@@ -164,7 +166,7 @@ public class Main {
 		world.setBlock(new Vector3i(0, 0, 0), Blocks.BLOCK_WHITE);
 		
 		SphereFeature theEternalSphere = new SphereFeature(new Vector3i(0, 24, 0), Blocks.BLOCK_BRICK, 25);
-		theEternalSphere.apply(world);
+		//theEternalSphere.apply(world);
 		
 		SphereFeature sphere = new SphereFeature(new Vector3i(8, 8, 0), Blocks.BLOCK_GHOST, 3);
 		sphere.apply(world);
@@ -185,11 +187,10 @@ public class Main {
 			world.setBlock(new Vector3i(8, i, 8), Blocks.BLOCK_WHITE);
 		}
 		
-		Camera camera = new Camera();
-		camera.position = new Vector3f(0f, 0f, 5f);
+		//camera.position = new Vector3f(0f, 0f, 5f);
 		RendererBundle renderer = new RendererBundle(camera);
-		AABBCollider collider = new AABBCollider(new Vector3f(), new Vector3f(1f, 2f, 1f));
-		WorldCollider worldCollider = new WorldCollider(world);
+		//AABBCollider collider = new AABBCollider(new Vector3f(), new Vector3f(1f, 2f, 1f));
+		//WorldCollider worldCollider = new WorldCollider(world);
 		//MeshRenderer renderer = new MeshRenderer(shader, camera);
 		Input.lockMouse();
 		
@@ -203,11 +204,11 @@ public class Main {
 			
 			if (Input.keyJustPressed(GLFW.GLFW_KEY_ESCAPE)) {
 				Input.unlockMouse();
-				camera.rotationFrozen = true;
+				world.player.rotationFrozen = true;
 			}
 			if (Input.buttonJustPressed(GLFW.GLFW_MOUSE_BUTTON_1)) {
 				Input.lockMouse();
-				camera.rotationFrozen = false;
+				world.player.rotationFrozen = false;
 			}
 			
 			if (Input.keyJustPressed(GLFW.GLFW_KEY_SPACE)) {
@@ -215,8 +216,12 @@ public class Main {
 			}
 			
 			camera.update();
-			collider.position = new Vector3f(camera.position).sub(new Vector3f(0.5f, 1f, 0.5f));
-			collider.resolve(worldCollider);
+			world.player.update(world, renderer.debug);
+			if (Input.keyPressed(GLFW.GLFW_KEY_E)) {
+				//world.player.collider.position = new Vector3f(camera.position).sub(new Vector3f(0.5f, 1f, 0.5f));
+				//world.player.collider.resolve(worldCollider);
+				renderer.debug.drawCube(world.player.collider.position, new Vector3f(world.player.collider.position).add(world.player.collider.size), Color.RED);
+			}
 			world.update();
 			world.render(renderer.mesh);
 			
@@ -242,7 +247,6 @@ public class Main {
 	}
 	
 	private static GLFWFramebufferSizeCallback resize = new GLFWFramebufferSizeCallback() {
-		
 		@Override
 		public void invoke(long window, int width, int height) {
 			GL11.glViewport(0, 0, width, height);

@@ -7,9 +7,11 @@ import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
+import samresp14.src.Camera;
 import samresp14.src.Texture;
 import samresp14.src.game.blocks.Block;
 import samresp14.src.game.blocks.BlockState;
+import samresp14.src.game.player.Player;
 import samresp14.src.game.worldgen.ProtoChunk;
 import samresp14.src.game.worldgen.WorldBuilder;
 import samresp14.src.rendering.MeshRenderer;
@@ -20,13 +22,15 @@ public class World {
 	private Texture atlas;
 	public WorldBuilder builder;
 	private List<ProtoChunk> protoChunks;
+	public Player player;
 	
-	public World(Texture atlas) {
+	public World(Texture atlas, Camera camera) {
 		chunks = new ArrayList<>();
 		this.atlas = atlas;
 		dirtyChunks = new ArrayList<>();
 		builder = new WorldBuilder();
 		protoChunks = new ArrayList<>();
+		player = new Player(camera, new Vector3f());
 	}
 	
 	private ProtoChunk addProtoChunk(Vector2i position) {
@@ -117,7 +121,7 @@ public class World {
 	}
 	
 	public Vector2i getChunkPos(Vector2i position) {
-		return new Vector2i(position.x >= 0 ? (position.x + 1) / 16 : (position.x / 16) - 1, position.y >= 0 ? position.y / 16 : ((position.y + 1) / 16) - 1);
+		return new Vector2i(position.x >= 0 ? position.x / 16 : ((position.x + 1) / 16) - 1, position.y >= 0 ? position.y / 16 : ((position.y + 1) / 16) - 1);
 	}
 	
 	private int chunkMod(int pos) {
